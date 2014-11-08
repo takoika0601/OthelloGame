@@ -321,10 +321,10 @@ public class MainBoard extends JPanel implements MouseListener {
 	}
 
 	private void endGame() {
-		if (putNumber == END_NUMBER) {
-			Counter counter;
-			counter = countStone();
+		Counter counter;
+		counter = countStone();
 
+		if (putNumber == END_NUMBER) {
 			if (counter.blackCount > 32) {
 				gameState = YOU_WIN;
 			} else if (counter.blackCount < 32) {
@@ -332,6 +332,10 @@ public class MainBoard extends JPanel implements MouseListener {
 			} else {
 				gameState = DRAW_GANE;
 			}
+		} else if (counter.whiteCount == 0) {
+			gameState = YOU_WIN;
+		} else if (counter.blackCount == 0) {
+			gameState = YOU_LOSE;
 		}
 	}
 
@@ -357,19 +361,34 @@ public class MainBoard extends JPanel implements MouseListener {
 			gameState = PLAY;
 			break;
 		case PLAY:
-			int x = e.getX() / GS;
-			int y = e.getY() / GS;
-
-			if (canPutDown(x, y)) {
-				putDownStone(x, y);
-				reverse(x, y);
-
-				flagForWhite = !flagForWhite;
-			} else {
-				buu.play();
+			int canput = 0;
+			for (int y = 0; y < MASU; y++) {
+				for (int x = 0; x < MASU; x++) {
+					if (canPutDown(x, y)) {
+						break;
+					}
+				}
 			}
+			if (canput == 0) {
+				flagForWhite = !flagForWhite;
+			}
+			if (!flagForWhite) {
 
-			endGame();
+				int x = e.getX() / GS;
+				int y = e.getY() / GS;
+
+				if (canPutDown(x, y)) {
+					putDownStone(x, y);
+					reverse(x, y);
+
+					flagForWhite = !flagForWhite;
+
+					cpuTurn();
+				} else {
+					buu.play();
+				}
+				endGame();
+			}
 			break;
 		case DRAW_GANE:
 			gameState = START;
@@ -377,6 +396,22 @@ public class MainBoard extends JPanel implements MouseListener {
 			break;
 		}
 		repaint();
+	}
+
+	private void cpuTurn() {
+		int[] canPutBoard = new int[MASU * MASU];
+
+		for (int y = 0; y < MASU; y++) {
+			for (int x = 0; x < MASU; x++) {
+				if (canPutDown(x, y) && flagForWhite) {
+					putDownStone(x, y);
+					reverse(x, y);
+
+					flagForWhite = !flagForWhite;
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
