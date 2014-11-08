@@ -2,11 +2,11 @@ package jp.co.shinkai;
 
 public class Stone {
 	// ‹ó”’ƒ}ƒX
-	private static final int BLANK = 0;
+	public static final int BLANK = 0;
 	// •Î
-	private static final int BLACK_STONE = 1;
+	public static final int BLACK_STONE = 1;
 	// ”’Î
-	private static final int WHITE_STONE = -1;
+	public static final int WHITE_STONE = -1;
 
 	private int stone;
 

@@ -20,12 +20,6 @@ public class MainBoard extends JPanel implements MouseListener {
 	// 盤面の大きさ
 	private static final int WIDTH = GS * MASU;
 	private static final int HEIGHT = WIDTH;
-	// 空白マス
-	private static final int BLANK = 0;
-	// 黒石
-	private static final int BLACK_STONE = 1;
-	// 白石
-	private static final int WHITE_STONE = -1;
 	// スリープタイム
 	private static final int SLEEP_TIME = 500;
 	// 終了時の石の数
@@ -78,10 +72,10 @@ public class MainBoard extends JPanel implements MouseListener {
 			}
 		}
 
-		board[3][3].setStone(WHITE_STONE);
-		board[4][4].setStone(WHITE_STONE);
-		board[3][4].setStone(BLACK_STONE);
-		board[4][3].setStone(BLACK_STONE);
+		board[3][3].setStone(Stone.WHITE_STONE);
+		board[4][4].setStone(Stone.WHITE_STONE);
+		board[3][4].setStone(Stone.BLACK_STONE);
+		board[4][3].setStone(Stone.BLACK_STONE);
 
 		flagForWhite = false;
 		putNumber = 0;
@@ -146,11 +140,11 @@ public class MainBoard extends JPanel implements MouseListener {
 	private void drawStone(Graphics g) {
 		for (int y = 0; y < MASU; y++) {
 			for (int x = 0; x < MASU; x++) {
-				if (board[y][x].getStone() == BLANK) {
+				if (board[y][x].getStone() == Stone.BLANK) {
 					continue;
-				} else if (board[y][x].getStone() == BLACK_STONE) {
+				} else if (board[y][x].getStone() == Stone.BLACK_STONE) {
 					g.setColor(Color.BLACK);
-				} else if (board[y][x].getStone() == WHITE_STONE) {
+				} else if (board[y][x].getStone() == Stone.WHITE_STONE) {
 					g.setColor(Color.WHITE);
 				}
 				g.fillOval(x * GS + 3, y * GS + 3, GS - 6, GS - 6);
@@ -171,9 +165,9 @@ public class MainBoard extends JPanel implements MouseListener {
 		int stone;
 
 		if (flagForWhite) {
-			stone = WHITE_STONE;
+			stone = Stone.WHITE_STONE;
 		} else {
-			stone = BLACK_STONE;
+			stone = Stone.BLACK_STONE;
 		}
 
 		putNumber++;
@@ -188,7 +182,7 @@ public class MainBoard extends JPanel implements MouseListener {
 		if (x >= MASU || y >= MASU) {
 			return false;
 		}
-		if (board[y][x].getStone() != BLANK) {
+		if (board[y][x].getStone() != Stone.BLANK) {
 			return false;
 		}
 		if (canPutDown(x, y, 1, 0)) {
@@ -222,9 +216,9 @@ public class MainBoard extends JPanel implements MouseListener {
 		int putStone;
 
 		if (flagForWhite) {
-			putStone = WHITE_STONE;
+			putStone = Stone.WHITE_STONE;
 		} else {
-			putStone = BLACK_STONE;
+			putStone = Stone.BLACK_STONE;
 		}
 
 		x += vecX;
@@ -236,7 +230,7 @@ public class MainBoard extends JPanel implements MouseListener {
 		if (board[y][x].getStone() == putStone) {
 			return false;
 		}
-		if (board[y][x].getStone() == BLANK) {
+		if (board[y][x].getStone() == Stone.BLANK) {
 			return false;
 		}
 
@@ -244,7 +238,7 @@ public class MainBoard extends JPanel implements MouseListener {
 		y += vecY;
 
 		while (x >= 0 && x < MASU && y >= 0 && y < MASU) {
-			if (board[y][x].getStone() == BLANK) {
+			if (board[y][x].getStone() == Stone.BLANK) {
 				return false;
 			}
 			if (board[y][x].getStone() == putStone) {
@@ -294,9 +288,9 @@ public class MainBoard extends JPanel implements MouseListener {
 		int putStone;
 
 		if (flagForWhite) {
-			putStone = WHITE_STONE;
+			putStone = Stone.WHITE_STONE;
 		} else {
-			putStone = BLACK_STONE;
+			putStone = Stone.BLACK_STONE;
 		}
 
 		x += vecX;
@@ -356,9 +350,9 @@ public class MainBoard extends JPanel implements MouseListener {
 
 		for (int y = 0; y < MASU; y++) {
 			for (int x = 0; x < MASU; x++) {
-				if (board[y][x].getStone() == BLACK_STONE) {
+				if (board[y][x].getStone() == Stone.BLACK_STONE) {
 					counter.blackCount++;
-				} else if (board[y][x].getStone() == WHITE_STONE) {
+				} else if (board[y][x].getStone() == Stone.WHITE_STONE) {
 					counter.whiteCount++;
 				}
 			}
@@ -411,8 +405,6 @@ public class MainBoard extends JPanel implements MouseListener {
 	}
 
 	private void cpuTurn() {
-		int[] canPutBoard = new int[MASU * MASU];
-
 		for (int y = 0; y < MASU; y++) {
 			for (int x = 0; x < MASU; x++) {
 				if (canPutDown(x, y) && flagForWhite) {
