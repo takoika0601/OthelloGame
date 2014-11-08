@@ -39,7 +39,7 @@ public class MainBoard extends JPanel implements MouseListener {
 	private static final int DRAW_GANE = 4;
 
 	// 盤面
-	private int[][] board = new int[MASU][MASU];
+	private Stone[][] board = new Stone[MASU][MASU];
 	// 白の番かどうか
 	private boolean flagForWhite;
 	// 打たれた石の数
@@ -50,7 +50,7 @@ public class MainBoard extends JPanel implements MouseListener {
 	private AudioClip buu;
 
 	// ゲーム状態
-	private int gameState;
+	public int gameState;
 
 	// 情報パネルへの参照
 	private InfoPanel infoPanel;
@@ -68,6 +68,23 @@ public class MainBoard extends JPanel implements MouseListener {
 		addMouseListener(this);
 
 		gameState = START;
+	}
+
+	private void initBoard() {
+		for (int y = 0; y < MASU; y++) {
+			for (int x = 0; x < MASU; x++) {
+				// board[y][x] = BLANK;
+				board[y][x] = new Stone();
+			}
+		}
+
+		board[3][3].setStone(WHITE_STONE);
+		board[4][4].setStone(WHITE_STONE);
+		board[3][4].setStone(BLACK_STONE);
+		board[4][3].setStone(BLACK_STONE);
+
+		flagForWhite = false;
+		putNumber = 0;
 	}
 
 	public void paintComponent(Graphics g) {
@@ -100,21 +117,6 @@ public class MainBoard extends JPanel implements MouseListener {
 			drawTextContering(g, "DRAW");
 			break;
 		}
-
-	}
-
-	private void initBoard() {
-		for (int y = 0; y < MASU; y++) {
-			for (int x = 0; x < MASU; x++) {
-				board[y][x] = BLANK;
-			}
-		}
-
-		board[3][3] = board[4][4] = WHITE_STONE;
-		board[3][4] = board[4][3] = BLACK_STONE;
-
-		flagForWhite = false;
-		putNumber = 0;
 	}
 
 	private void drawBoard(Graphics g) {
@@ -144,16 +146,25 @@ public class MainBoard extends JPanel implements MouseListener {
 	private void drawStone(Graphics g) {
 		for (int y = 0; y < MASU; y++) {
 			for (int x = 0; x < MASU; x++) {
-				if (board[y][x] == BLANK) {
+				if (board[y][x].getStone() == BLANK) {
 					continue;
-				} else if (board[y][x] == BLACK_STONE) {
+				} else if (board[y][x].getStone() == BLACK_STONE) {
 					g.setColor(Color.BLACK);
-				} else if (board[y][x] == WHITE_STONE) {
+				} else if (board[y][x].getStone() == WHITE_STONE) {
 					g.setColor(Color.WHITE);
 				}
 				g.fillOval(x * GS + 3, y * GS + 3, GS - 6, GS - 6);
 			}
 		}
+	}
+
+	private void drawTextContering(Graphics g, String s) {
+		Font font = new Font("SansSerif", Font.BOLD, 20);
+		g.setFont(font);
+		FontMetrics fMetrics = g.getFontMetrics();
+		g.setColor(Color.YELLOW);
+		g.drawString(s, WIDTH / 2 - fMetrics.stringWidth(s) / 2, HEIGHT / 2
+				+ fMetrics.getDescent());
 	}
 
 	private void putDownStone(int x, int y) {
@@ -166,7 +177,7 @@ public class MainBoard extends JPanel implements MouseListener {
 		}
 
 		putNumber++;
-		board[y][x] = stone;
+		board[y][x].setStone(stone);
 		kachi.play();
 
 		update(getGraphics());
@@ -177,7 +188,7 @@ public class MainBoard extends JPanel implements MouseListener {
 		if (x >= MASU || y >= MASU) {
 			return false;
 		}
-		if (board[y][x] != 0) {
+		if (board[y][x].getStone() != BLANK) {
 			return false;
 		}
 		if (canPutDown(x, y, 1, 0)) {
@@ -222,10 +233,10 @@ public class MainBoard extends JPanel implements MouseListener {
 		if (x < 0 || x >= MASU || y < 0 || y >= MASU) {
 			return false;
 		}
-		if (board[y][x] == putStone) {
+		if (board[y][x].getStone() == putStone) {
 			return false;
 		}
-		if (board[y][x] == BLANK) {
+		if (board[y][x].getStone() == BLANK) {
 			return false;
 		}
 
@@ -233,10 +244,10 @@ public class MainBoard extends JPanel implements MouseListener {
 		y += vecY;
 
 		while (x >= 0 && x < MASU && y >= 0 && y < MASU) {
-			if (board[y][x] == BLANK) {
+			if (board[y][x].getStone() == BLANK) {
 				return false;
 			}
-			if (board[y][x] == putStone) {
+			if (board[y][x].getStone() == putStone) {
 				return true;
 			}
 			x += vecX;
@@ -291,8 +302,8 @@ public class MainBoard extends JPanel implements MouseListener {
 		x += vecX;
 		y += vecY;
 
-		while (board[y][x] != putStone) {
-			board[y][x] = putStone;
+		while (board[y][x].getStone() != putStone) {
+			board[y][x].setStone(putStone);
 			kachi.play();
 
 			update(getGraphics());
@@ -309,15 +320,6 @@ public class MainBoard extends JPanel implements MouseListener {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void drawTextContering(Graphics g, String s) {
-		Font font = new Font("SansSerif", Font.BOLD, 20);
-		g.setFont(font);
-		FontMetrics fMetrics = g.getFontMetrics();
-		g.setColor(Color.YELLOW);
-		g.drawString(s, WIDTH / 2 - fMetrics.stringWidth(s) / 2, HEIGHT / 2
-				+ fMetrics.getDescent());
 	}
 
 	private void endGame() {
@@ -339,14 +341,24 @@ public class MainBoard extends JPanel implements MouseListener {
 		}
 	}
 
+	public class Counter {
+		public int blackCount;
+		public int whiteCount;
+
+		public Counter() {
+			blackCount = 0;
+			whiteCount = 0;
+		}
+	}
+
 	private Counter countStone() {
 		Counter counter = new Counter();
 
 		for (int y = 0; y < MASU; y++) {
 			for (int x = 0; x < MASU; x++) {
-				if (board[y][x] == BLACK_STONE) {
+				if (board[y][x].getStone() == BLACK_STONE) {
 					counter.blackCount++;
-				} else if (board[y][x] == WHITE_STONE) {
+				} else if (board[y][x].getStone() == WHITE_STONE) {
 					counter.whiteCount++;
 				}
 			}
@@ -437,13 +449,4 @@ public class MainBoard extends JPanel implements MouseListener {
 		// TODO 自動生成されたメソッド・スタブ
 	}
 
-	private class Counter {
-		public int blackCount;
-		public int whiteCount;
-
-		public Counter() {
-			blackCount = 0;
-			whiteCount = 0;
-		}
-	}
 }
