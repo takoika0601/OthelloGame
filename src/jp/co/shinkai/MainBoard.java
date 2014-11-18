@@ -365,6 +365,7 @@ public class MainBoard extends JPanel implements MouseListener {
 			for (int y = 0; y < MASU; y++) {
 				for (int x = 0; x < MASU; x++) {
 					if (canPutDown(x, y)) {
+						canput = 1;
 						break;
 					}
 				}
@@ -388,9 +389,19 @@ public class MainBoard extends JPanel implements MouseListener {
 					buu.play();
 				}
 				endGame();
+			} else {
+				cpuTurn();
 			}
 			break;
 		case DRAW_GANE:
+			gameState = START;
+			initBoard();
+			break;
+		case YOU_WIN:
+			gameState = START;
+			initBoard();
+			break;
+		case YOU_LOSE:
 			gameState = START;
 			initBoard();
 			break;
