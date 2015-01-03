@@ -9,6 +9,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -35,7 +36,7 @@ public class MainBoard extends JPanel implements MouseListener {
 	// î’ñ 
 	private Stone[][] board = new Stone[MASU][MASU];
 	// îíÇÃî‘Ç©Ç«Ç§Ç©
-	private boolean flagForWhite;
+	public boolean flagForWhite;
 	// ë≈ÇΩÇÍÇΩêŒÇÃêî
 	private int putNumber;
 	// êŒÇë≈Ç¬âπ
@@ -67,7 +68,6 @@ public class MainBoard extends JPanel implements MouseListener {
 	private void initBoard() {
 		for (int y = 0; y < MASU; y++) {
 			for (int x = 0; x < MASU; x++) {
-				// board[y][x] = BLANK;
 				board[y][x] = new Stone();
 			}
 		}
@@ -89,7 +89,11 @@ public class MainBoard extends JPanel implements MouseListener {
 
 		switch (gameState) {
 		case START:
-			drawTextContering(g, "OTHELLO");
+			ArrayList<String> strings = new ArrayList<String>();
+			strings.add("OTHELLO");
+			strings.add("YOU : BLACK");
+			strings.add("CPU : WHITE");
+			drawTextContering(g, strings);
 			break;
 		case PLAY:
 			// êŒÇï`Ç≠
@@ -159,6 +163,18 @@ public class MainBoard extends JPanel implements MouseListener {
 		g.setColor(Color.YELLOW);
 		g.drawString(s, WIDTH / 2 - fMetrics.stringWidth(s) / 2, HEIGHT / 2
 				+ fMetrics.getDescent());
+	}
+
+	private void drawTextContering(Graphics g, ArrayList<String> s) {
+		Font font = new Font("SansSerif", Font.BOLD, 20);
+		g.setFont(font);
+		FontMetrics fMetrics = g.getFontMetrics();
+		g.setColor(Color.YELLOW);
+
+		for (int i = 0; i < s.size(); i++) {
+			g.drawString(s.get(i), WIDTH / 2 - fMetrics.stringWidth(s.get(i))
+					/ 2, HEIGHT / 2 + fMetrics.getDescent() + i * 20 - 20);
+		}
 	}
 
 	private void putDownStone(int x, int y) {
@@ -257,27 +273,21 @@ public class MainBoard extends JPanel implements MouseListener {
 		}
 		if (canPutDown(x, y, 0, 1)) {
 			reverse(x, y, 0, 1);
-			;
 		}
 		if (canPutDown(x, y, -1, 0)) {
 			reverse(x, y, -1, 0);
-			;
 		}
 		if (canPutDown(x, y, 0, -1)) {
 			reverse(x, y, 0, -1);
-			;
 		}
 		if (canPutDown(x, y, 1, 1)) {
 			reverse(x, y, 1, 1);
-			;
 		}
 		if (canPutDown(x, y, -1, -1)) {
 			reverse(x, y, -1, -1);
-			;
 		}
 		if (canPutDown(x, y, 1, -1)) {
 			reverse(x, y, 1, -1);
-			;
 		}
 		if (canPutDown(x, y, -1, 1)) {
 			reverse(x, y, -1, 1);
@@ -332,16 +342,6 @@ public class MainBoard extends JPanel implements MouseListener {
 			gameState = YOU_WIN;
 		} else if (counter.blackCount == 0) {
 			gameState = YOU_LOSE;
-		}
-	}
-
-	public class Counter {
-		public int blackCount;
-		public int whiteCount;
-
-		public Counter() {
-			blackCount = 0;
-			whiteCount = 0;
 		}
 	}
 

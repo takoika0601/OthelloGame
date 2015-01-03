@@ -21,5 +21,4 @@ public class Stone {
 	public int getStone() {
 		return stone;
 	}
-
 }
